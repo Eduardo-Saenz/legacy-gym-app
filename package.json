@@ -1,0 +1,30 @@
+{
+  "name": "legacy-gym-app",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": "22.20.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @legacy-gym/web dev",
+    "build": "pnpm --filter @legacy-gym/web build",
+    "lint": "pnpm --filter @legacy-gym/web lint",
+    "typecheck": "pnpm --filter @legacy-gym/web typecheck && tsc --project tsconfig.tools.json",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:test": "supabase test db --local && vitest run --config vitest.db.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@types/node": "22.19.15",
+    "postgres": "4.1.0",
+    "prettier": "3.9.10",
+    "supabase": "2.75.0",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}

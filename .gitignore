@@ -1,0 +1,11 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+playwright-report/
+test-results/
+coverage/
+.env*
+.codex/
+supabase/.branches/
+supabase/.temp/

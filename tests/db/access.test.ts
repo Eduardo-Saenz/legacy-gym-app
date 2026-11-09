@@ -79,6 +79,24 @@ async function rows(path: string, actor: Actor) {
   return response.json();
 }
 
+async function waitForDataApi() {
+  const deadline = Date.now() + 45_000;
+  let httpStatus: number;
+
+  do {
+    const response = await data("clients?select=id&limit=0", "unprovisioned", {
+      signal: AbortSignal.timeout(3_000),
+    });
+    httpStatus = response.status;
+    await response.body?.cancel();
+    if (httpStatus === 200) return;
+    if (![502, 503, 504].includes(httpStatus)) break;
+    await sleep(500);
+  } while (Date.now() < deadline);
+
+  throw new Error(`La Data API local no está lista (HTTP ${httpStatus})`);
+}
+
 beforeAll(async () => {
   status = JSON.parse(
     execFileSync("supabase", ["status", "-o", "json"], {
@@ -120,6 +138,9 @@ beforeAll(async () => {
     if (!access_token) throw new Error("Auth local no emitió un JWT");
     record.jwt = access_token;
   }
+
+  // A database reset can finish before PostgREST is ready behind the gateway.
+  await waitForDataApi();
 
   await sql.begin(async (tx) => {
     await tx`insert into gym_api.profiles (id)

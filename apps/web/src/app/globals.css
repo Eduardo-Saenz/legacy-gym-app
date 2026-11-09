@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@layer base {
+  a {
+    @apply text-sky-300 underline underline-offset-4;
+  }
+
+  label {
+    @apply grid gap-1 text-sm font-medium;
+  }
+
+  input:not([type="hidden"]),
+  select,
+  textarea {
+    @apply w-full rounded border border-slate-500 bg-slate-950 px-3 py-2 text-base text-slate-100;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-300;
+  }
+}
+
+@layer components {
+  .primary-button,
+  .secondary-button {
+    @apply w-fit rounded px-3 py-2 font-semibold disabled:opacity-60;
+  }
+
+  .primary-button {
+    @apply bg-sky-300 text-slate-950;
+  }
+
+  .secondary-button {
+    @apply border border-slate-500 bg-slate-900 text-slate-100;
+  }
+}

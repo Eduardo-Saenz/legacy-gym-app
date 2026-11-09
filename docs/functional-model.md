@@ -7,6 +7,6 @@
 
 Cada cliente tiene como máximo un coach activo en toda la plataforma. Puede quedar temporalmente sin coach y conservar su acceso al historial. Al cambiar de coach, el historial sigue bajo titularidad del cliente. El nuevo coach necesita una relación activa y una autorización vigente del cliente. El coach anterior pierde el acceso operativo al finalizar la relación. Cualquier excepción de conservación legal se resolverá por separado antes de habilitarla.
 
-Nombre, sexo y fecha de nacimiento forman parte de la ficha inicial. Peso y estatura se registran como mediciones históricas. Los campos editables y su obligatoriedad se definen explícitamente antes de implementar los formularios. Se conserva fecha, valor, unidad y autor de cada medición. Una corrección conserva el original y agrega valor corregido, autor, fecha y motivo.
+El nombre y la fecha de nacimiento opcional forman parte de la ficha de la Fase 2. Ambos campos admiten edición auditada por el titular o el coach delegado. El campo sexo se difiere hasta definir su finalidad. Peso y estatura se registran como mediciones históricas con fecha de medición, fecha de registro, unidad y autor. Cada corrección conserva el valor anterior y el nuevo, con actor, fecha y motivo.
 
 Una asignación apunta a una versión publicada de la rutina. Publicar una nueva versión conserva lo prescrito y lo registrado anteriormente. El historial deportivo del cliente permanece disponible para él después de terminar la relación.

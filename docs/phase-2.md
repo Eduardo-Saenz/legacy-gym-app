@@ -28,3 +28,12 @@ La base exige peso de 10 a 500 kg, estatura de 40 a 280 cm, precisión de hasta 
 La Fase 2 prueba transferencias con una transacción administrativa controlada que cierra la relación anterior y abre la nueva. El cliente conserva su identificador, ficha, mediciones y revisiones. El nuevo coach debe recibir consentimiento explícito y el anterior pierde acceso. La interfaz de transferencia y la vinculación de cuentas existentes quedan pendientes de definir quién inicia y confirma la operación.
 
 La aplicación está configurada para la instancia local y Mailpit. Antes de un piloto con datos reales quedan por resolver el transporte de correo, la configuración de despliegue, la gestión de menores, la retención y la restauración. El contrato JSON de [mediciones](measurements.openapi.yaml) usa credenciales Bearer de Supabase y verifica su identidad en el servidor. Los formularios web reutilizan los mismos casos de uso y controles de PostgreSQL.
+
+## Observaciones de UX para fases posteriores
+
+La validación manual de los portales de coach y cliente confirmó los flujos principales. Se registran estas mejoras sin ampliar el alcance funcional de este PR:
+
+- Mostrar nombres reconocibles de coaches y gimnasios en lugar de UUID.
+- Presentar las fechas en un formato adecuado para México.
+- Simplificar la presentación de autorizaciones para usuarios no técnicos.
+- Mejorar la navegación y la jerarquía visual.

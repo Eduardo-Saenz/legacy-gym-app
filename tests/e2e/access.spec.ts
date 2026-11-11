@@ -211,9 +211,42 @@ test("invitación, ficha, consentimiento, corrección y recuperación de contras
     await coach.goto("/coach/clientes/" + randomUUID());
     await expect(coach.getByRole("heading", { name: "404" })).toBeVisible();
 
+    const writeGrant = client
+      .getByRole("heading", { name: "Editar mi ficha", exact: true })
+      .locator("..");
+    await writeGrant
+      .getByRole("button", { name: "Conceder autorización" })
+      .click();
+    await expect(
+      writeGrant.getByRole("button", { name: "Revocar autorización" }),
+    ).toBeVisible();
+    await coach.goto(detailPath);
+    await expect(coach.getByLabel("Nombre", { exact: true })).toHaveValue("");
+    await expect(
+      coach.getByLabel("Fecha de nacimiento (opcional)"),
+    ).toHaveValue("");
+    await expect(
+      coach.getByText("Cliente ficticio", { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      coach.getByRole("heading", { name: "Historial de mediciones" }),
+    ).toHaveCount(0);
+    await coach
+      .getByLabel("Nombre", { exact: true })
+      .fill("Ficha delegada ficticia");
+    await coach.getByLabel("Fecha de nacimiento (opcional)").fill("1996-06-06");
+    await coach.getByRole("button", { name: "Guardar ficha" }).click();
+    await expect(coach.getByText("Ficha guardada.")).toBeVisible();
+    await client.reload();
+    await expect(client.getByLabel("Nombre", { exact: true })).toHaveValue(
+      "Ficha delegada ficticia",
+    );
+    await expect(
+      client.getByLabel("Fecha de nacimiento (opcional)"),
+    ).toHaveValue("1996-06-06");
+
     for (const name of [
       "Consultar mi ficha",
-      "Editar mi ficha",
       "Consultar todo mi historial de mediciones y revisiones",
       "Corregir mediciones",
     ]) {
@@ -230,7 +263,10 @@ test("invitación, ficha, consentimiento, corrección y recuperación de contras
 
     await coach.goto(detailPath);
     await expect(
-      coach.getByRole("heading", { name: "Cliente ficticio", exact: true }),
+      coach.getByRole("heading", {
+        name: "Ficha delegada ficticia",
+        exact: true,
+      }),
     ).toBeVisible();
     await coach
       .getByLabel("Nombre", { exact: true })
@@ -290,6 +326,12 @@ test("invitación, ficha, consentimiento, corrección y recuperación de contras
 
     await client.getByRole("button", { name: "Cerrar sesión" }).click();
     await client.getByRole("link", { name: "Olvidé mi contraseña" }).click();
+    await expect(
+      client.getByRole("heading", {
+        name: "Recuperar contraseña",
+        exact: true,
+      }),
+    ).toBeVisible();
     await client.getByLabel("Correo", { exact: true }).fill(clientEmail);
     await client.getByRole("button", { name: "Enviar correo" }).click();
     await expect(client.getByRole("status")).toHaveText(

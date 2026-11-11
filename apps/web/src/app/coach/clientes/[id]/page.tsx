@@ -23,6 +23,7 @@ export default async function CoachClientPage({
   );
   if (!client) notFound();
   const profile = client.scopes.includes("client_record_read");
+  const editProfile = client.scopes.includes("client_profile_write");
   const history = client.scopes.includes("measurement_read");
   const [details, entries] = await Promise.all([
     profile ? clientDetails(db, id) : null,
@@ -36,12 +37,14 @@ export default async function CoachClientPage({
           <p>El cliente debe conceder los permisos que quiera compartir.</p>
         </Panel>
       )}
-      {profile && (
-        <ProfilePanel
-          target={id}
-          details={details}
-          editable={client.scopes.includes("client_profile_write")}
-        />
+      {editProfile && !profile && (
+        <p>
+          Puedes sustituir el nombre y la fecha de nacimiento, pero no consultar
+          sus valores actuales. Dejar la fecha vacía elimina la fecha guardada.
+        </p>
+      )}
+      {(profile || editProfile) && (
+        <ProfilePanel target={id} details={details} editable={editProfile} />
       )}
       {client.scopes.includes("measurement_write") && (
         <RecordMeasurementPanel target={id} />

@@ -1,60 +1,53 @@
 # Legacy Gym App
 
-Plataforma web para coaches deportivos y sus clientes. La Fase 1 prepara un monolito modular con Next.js App Router, TypeScript estricto, Tailwind CSS y Supabase Auth/PostgreSQL. La portada y `GET /api/v1/health` comprueban que la web responde. La aplicación funcional comienza en la Fase 2.
+Plataforma web para coaches deportivos y sus clientes. La Fase 2 incorpora acceso por correo y contraseña, invitaciones, ficha personal, mediciones con revisiones y consentimiento por relación. La aplicación usa Next.js App Router, TypeScript estricto, Tailwind y Supabase Auth/PostgreSQL.
 
 ## Desarrollo local en WSL2
 
-Requisitos:
-
-- Node.js según [`.nvmrc`](.nvmrc) y pnpm según [`package.json`](package.json).
-- Docker con acceso desde la distribución WSL (`docker info`). Con Docker Desktop, habilita la integración para esa distribución.
-
-Desde la raíz de un clon:
+Usa Node.js según [`.nvmrc`](.nvmrc), pnpm según [`package.json`](package.json) y Docker con integración para tu distribución WSL. Trabaja únicamente con cuentas y datos ficticios.
 
 ```sh
 nvm install
 nvm use
 corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm db:start
+corepack pnpm dev:local
 ```
 
-Abre [la web](http://localhost:3000). Para usar `pnpm` directamente en los comandos siguientes, habilita Corepack con `corepack enable` o antepón `corepack` a cada comando. La web de esta fase arranca por separado de la base de datos.
+Abre [la web](http://127.0.0.1:3000) y [Mailpit](http://127.0.0.1:54324). Usa la dirección `127.0.0.1` de la web para mantener la misma sesión al seguir los enlaces. El servidor obtiene las claves locales de Supabase sin imprimirlas ni guardarlas en archivos. La API local usa el puerto 54321, PostgreSQL el 54322 y [Studio](http://127.0.0.1:54323) el 54323.
 
-## Supabase local
+Si Supabase ya estaba en marcha con una versión anterior, ejecuta `corepack pnpm exec supabase migration up --local` y luego `corepack pnpm db:stop` y `corepack pnpm db:start`. La parada normal preserva el volumen y el reinicio carga la plantilla de recuperación. En una instancia desechable, `corepack pnpm exec supabase db reset --local` reconstruye la base y borra su contenido local. CI ejecuta ese comando en un runner nuevo.
 
-```sh
-pnpm db:start
-pnpm db:test
-pnpm db:stop
-```
+## Probar el flujo manualmente
 
-La API local usa el puerto 54321, PostgreSQL el 54322 y [Studio](http://127.0.0.1:54323) el 54323. El arranque aplica las migraciones pendientes. En una instancia **desechable**, `pnpm exec supabase db reset --local` reconstruye la base y borra su contenido local. CI lo ejecuta en un runner nuevo.
+1. Aprovisiona el primer coach con una contraseña ficticia de al menos 12 caracteres. En Bash, el siguiente comando lee la contraseña sin mostrarla. Si se repite con la misma cuenta provisionada, conserva el acceso y la contraseña existente.
 
-Las pruebas pgTAP verifican RLS y grants. La suite de integración aprovisiona cuentas ficticias `example.invalid` mediante Auth local, conserva los JWT de inicio de sesión durante las pruebas y elimina sus fixtures al finalizar. Usa las claves generadas por Supabase local únicamente dentro del proceso de pruebas. El registro público y el anónimo están deshabilitados.
+   ```bash
+   read -rsp 'Contraseña ficticia: ' LEGACY_COACH_PASSWORD
+   printf '\n'
+   LEGACY_COACH_EMAIL=coach@example.invalid LEGACY_COACH_PASSWORD="$LEGACY_COACH_PASSWORD" corepack pnpm coach:local
+   unset LEGACY_COACH_PASSWORD
+   ```
 
-### Superficie de la Data API
-
-| Recurso en `gym_api` | Lectura autenticada                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `profiles`           | Identificador del perfil propio                                                                                           |
-| `organizations`      | Identificador y nombre de la organización de una membresía de coach vigente                                               |
-| `coach_memberships`  | Membresías propias vigentes                                                                                               |
-| `clients`            | Identificadores del cliente y su perfil. Visible para el titular o su coach vigente con autorización `client_record_read` |
-
-Las relaciones y las autorizaciones quedan en `gym_private`. Las escrituras de usuarios por la Data API están denegadas y la única función elevada se usa dentro de una política de lectura. El índice parcial de PostgreSQL impone una relación activa global por cliente. La suite comprueba intentos de autoasignación, acceso cruzado, revocación, transferencia y asignaciones simultáneas entre organizaciones.
+2. Inicia sesión como coach en la web e invita a `cliente@example.invalid`. El portal muestra vigencia, estado y entrega. Puedes reenviar o revocar una invitación pendiente.
+3. Abre el correo de invitación en Mailpit. En una ventana privada sigue el enlace, confirma el correo y establece la contraseña. Completa el nombre y, si quieres, la fecha de nacimiento. Registra una medición.
+4. En el portal del cliente, concede lectura de ficha e historial y permiso de corrección. Para probar el resto, concede también edición de ficha y registro de mediciones. En el portal del coach, abre el cliente y corrige una medición. Comprueba que el cliente ve el valor original y la revisión.
+5. Revoca la lectura de historial desde el portal del cliente y recarga la página del coach. La sesión anterior pierde acceso en la siguiente consulta.
+6. Cierra sesión, selecciona **Olvidé mi contraseña** y abre el correo de recuperación en Mailpit. Confirma la contraseña nueva y vuelve a iniciar sesión.
 
 ## Comprobaciones
 
 ```sh
-pnpm format:check
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm exec playwright install chromium
-pnpm test:e2e
+corepack pnpm format:check
+corepack pnpm lint
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm db:test
+corepack pnpm build
+corepack pnpm exec playwright install chromium
+corepack pnpm test:e2e:access
 ```
 
-En un Linux sin las bibliotecas del navegador, usa `pnpm exec playwright install --with-deps chromium`. Playwright prueba el build en el puerto 3100. GitHub Actions ejecuta las verificaciones web y de base de datos en trabajos separados.
+En un Linux sin las bibliotecas del navegador, usa `corepack pnpm exec playwright install --with-deps chromium`. La suite completa de Playwright usa el build en el puerto 3100 y requiere Supabase y Mailpit locales. `corepack pnpm test:e2e` ejecuta la comprobación web independiente. GitHub Actions valida la web y reconstruye la base en trabajos separados. Las suites crean y retiran sus propios datos ficticios.
 
-Siguen pendientes el mecanismo de activación, el tratamiento de cuentas existentes, los campos editables y el alcance de la autorización histórica. Consulta el [plan por fases](docs/plan.md), las [decisiones de arquitectura](docs/decisions/README.md) y las [instrucciones del repositorio](AGENTS.md).
+Consulta [la implementación de la Fase 2](docs/phase-2.md), el [contrato HTTP de mediciones](docs/measurements.openapi.yaml) y el [índice de documentación](docs/README.md).

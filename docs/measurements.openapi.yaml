@@ -1,0 +1,113 @@
+openapi: 3.1.0
+info:
+  title: Mediciones de Legacy Gym App
+  version: 1.0.0
+paths:
+  /api/v1/clients/{id}/measurements:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      summary: Consultar originales, valores vigentes y revisiones
+      responses:
+        "200":
+          description: Historial autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [measurements]
+                properties:
+                  measurements:
+                    type: array
+                    items: { $ref: "#/components/schemas/Measurement" }
+        "401": { description: Sesión inválida }
+        "404": { description: Cliente o historial no disponible }
+    post:
+      summary: Registrar una medición
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, unit, value, measuredOn]
+              properties:
+                kind: { enum: [weight, height] }
+                unit: { enum: [kg, cm] }
+                value: { type: number }
+                measuredOn: { type: string, format: date }
+      responses:
+        "201":
+          description: Medición creada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id]
+                properties:
+                  id: { type: string, format: uuid }
+        "400": { description: Datos inválidos }
+        "401": { description: Sesión inválida }
+        "404": { description: Cliente no disponible }
+    patch:
+      summary: Añadir una revisión de la versión observada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [measurementId, version, value, reason]
+              properties:
+                measurementId: { type: string, format: uuid }
+                version: { type: integer, minimum: 0 }
+                value: { type: number }
+                reason: { type: string, minLength: 1, maxLength: 300 }
+      responses:
+        "200":
+          description: Revisión guardada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [version]
+                properties:
+                  version: { type: integer, minimum: 1 }
+        "400": { description: Datos inválidos }
+        "401": { description: Sesión inválida }
+        "404": { description: Cliente o medición no disponible }
+        "409": { description: La versión observada ya cambió }
+security:
+  - bearer: []
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    Measurement:
+      type: object
+      required: [id, kind, unit, originalValue, measuredOn, recordedAt, recordedBy, currentValue, version, revisions]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { enum: [weight, height] }
+        unit: { enum: [kg, cm] }
+        originalValue: { type: number }
+        measuredOn: { type: string, format: date }
+        recordedAt: { type: string, format: date-time }
+        recordedBy: { type: string, format: uuid }
+        currentValue: { type: number }
+        version: { type: integer, minimum: 0 }
+        revisions:
+          type: array
+          items:
+            type: object
+            required: [version, previousValue, newValue, reason, correctedAt, correctedBy]
+            properties:
+              version: { type: integer, minimum: 1 }
+              previousValue: { type: number }
+              newValue: { type: number }
+              reason: { type: string }
+              correctedAt: { type: string, format: date-time }
+              correctedBy: { type: string, format: uuid }

@@ -31,6 +31,6 @@ Antes de usar datos reales, inventariar finalidad, acceso y retención de cada c
 
 - **Fase 1:** cerrar la superficie técnica de acceso y los invariantes de cliente global, relación única y autorización ligada a la relación. Los invariantes funcionales ya están aprobados. Mantener denegados los recursos y permisos aún no definidos. El workspace, CI y el esquema de acceso con datos ficticios pueden avanzar.
 
-- **Antes de implementar edición y acceso histórico:** campos editables y obligatoriedad por actor, alcance de la autorización y visibilidad de revisiones, corrección de registros hechos por terceros y edición de entrenamientos, quién confirma la transferencia y si se puede seguir usando una rutina previa para iniciar sesiones tras el cambio.
-- **Antes de implementar activación:** método de inicio de sesión, mecanismo de canje compatible con el correo elegido y decisión de incluir o diferir cuentas existentes.
+- **Fase 2.** La ficha y el historial siguen el [ADR 005](decisions/005-alcances-de-ficha-y-mediciones.md). El acceso es por correo y contraseña, el canje se confirma en Auth y la vinculación de cuentas existentes se difiere.
+- **Fases siguientes.** Definir quién inicia y confirma una transferencia desde la aplicación, la edición de entrenamientos y si una rutina previa permite iniciar sesiones después de un cambio de coach.
 - **Antes del piloto:** reglas para menores, región, retención, conservación legal y objetivos de recuperación. Mantener cualquier acceso excepcional deshabilitado hasta definirlo.

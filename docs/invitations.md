@@ -18,8 +18,8 @@ El registro público se deshabilita en Supabase Auth. El primer coach se incorpo
 
 Un fallo de correo es recuperable mediante un reintento controlado. La emisión sustituida nunca vuelve a activarse. Dos canjes simultáneos solo pueden generar una incorporación. La vinculación usa la identidad verificada de Supabase Auth como identificador estable. El correo verificado sirve para comprobar el destinatario durante el canje.
 
-Antes de implementar, validar en Supabase local la plantilla y el mecanismo exacto de verificación. El GET debe evitar también consumir la credencial de Auth. Verificar cómo se reenvía a una identidad pendiente o ya confirmada por un enlace anterior sin habilitar el registro público. La caducidad de la emisión y la de la credencial de Auth son independientes. Probar el canje cerca de las 48 horas y el rechazo a partir del vencimiento.
+La [implementación de la Fase 2](phase-2.md) usa un fragmento con un secreto aleatorio por emisión y una confirmación POST. El canje se confirma dentro de la transacción de creación de la cuenta de Auth. Los correos se entregan en Mailpit local.
 
 ## Correo asociado a una cuenta existente
 
-El flujo futuro pedirá iniciar sesión con esa cuenta y verificar que el correo coincide con el destinatario. Reutilizará el cliente global y conservará el historial. Si ya hay un coach activo, requerirá una transferencia explícita y autorización del cliente. Para el MVP se puede diferir ese flujo. En ese caso, la operación devuelve un estado controlado, sin crear cuentas duplicadas, modificar relaciones ni revelar si un correo existe a actores sin permiso.
+El flujo futuro pedirá iniciar sesión con esa cuenta y verificar que el correo coincide con el destinatario. Reutilizará el cliente global y conservará el historial. Si ya hay un coach activo, requerirá una transferencia explícita y autorización del cliente. La Fase 2 difiere esa vinculación. El envío usa el mismo estado de entrega para todos los destinatarios y el canje de una cuenta existente devuelve un error genérico. La cuenta y sus relaciones se conservan.

@@ -9,6 +9,8 @@ select is(
   (select count(*)::integer from pg_class as relation
    join pg_namespace as namespace on namespace.oid = relation.relnamespace
    where namespace.nspname in ('gym_api', 'gym_private')
+     and relation.relname in ('profiles', 'organizations', 'coach_memberships',
+       'clients', 'coach_client_relationships', 'client_authorizations')
      and relation.relkind = 'r' and relation.relrowsecurity),
   6,
   'Todas las tablas de acceso tienen RLS'

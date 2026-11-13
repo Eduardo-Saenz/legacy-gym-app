@@ -5,9 +5,9 @@ Denegar por defecto. Una cuenta autenticada solo identifica al actor. Los permis
 | Operación | Cliente | Coach | Operador de plataforma |
 | --- | --- | --- | --- |
 | Leer ficha, sesiones, mediciones y progreso | Solo propios | Relación activa y autorización del cliente para ese alcance | Sin acceso ordinario |
-| Editar datos personales | Campos propios autorizados | Campos delegados, con relación activa y autorización | Sin acceso ordinario |
+| Editar datos personales | Nombre y fecha de nacimiento propios | Nombre y fecha de nacimiento delegados, con relación activa y autorización | Sin acceso ordinario |
 | Registrar mediciones o entrenamientos | Solo propios | Para cliente activo con autorización de escritura aplicable | Sin acceso ordinario |
-| Corregir mediciones | Las que registró para sí mismo | Las de clientes activos con autorización de corrección | Sin acceso ordinario |
+| Corregir mediciones | Cualquier medición propia | Las de clientes activos con autorización de lectura y corrección | Sin acceso ordinario |
 | Ver revisiones de mediciones | Propias, como titular del historial | Con alcance autorizado para ver revisiones | Sin acceso ordinario |
 | Crear ejercicios, editar borradores y publicar rutinas | Sin acceso | Dentro de su ámbito de autoría en la organización | Sin acceso ordinario |
 | Asignar rutina publicada | Sin acceso | Para cliente activo con autorización aplicable | Sin acceso ordinario |
@@ -21,4 +21,4 @@ La autorización del coach exige una membresía vigente, la relación activa de 
 
 Los permisos aplican también a listados, búsquedas, joins, estadísticas, revisiones y respuestas de error. Derivar el titular y el ámbito de las relaciones persistidas, comprobar cada identificador de la solicitud y rechazar cambios directos a campos de titularidad, procedencia, autoría y autorización. Para escrituras sensibles, serializar la comprobación y la operación respecto a transferencias y revocaciones. Una vez confirmada la revocación, los accesos posteriores deben fallar incluso con un JWT anterior.
 
-La interpretación inicial de «sus propias mediciones» distingue la autoría de la titularidad. El cliente puede consultar una medición que otro registró sobre él y corregir las que él mismo registró. Aprobar antes de implementar la edición: lista de campos por actor, alcance del acceso histórico, corrección de mediciones registradas por terceros y reglas para modificar entrenamientos ya registrados. Los permisos pendientes se mantienen cerrados.
+La [decisión de la Fase 2](decisions/005-alcances-de-ficha-y-mediciones.md) permite corregir independientemente de la autoría y establece los permisos separados de lectura, registro y corrección. Las reglas de entrenamiento se definirán en su fase.

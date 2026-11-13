@@ -1,4 +1,4 @@
-name: Fase 1
+name: Legacy Gym App
 
 on:
   pull_request:
@@ -47,5 +47,8 @@ jobs:
       - name: Reconstruir la base ficticia del runner
         run: pnpm exec supabase db reset --local
       - run: pnpm db:test
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e:access
       - if: always()
         run: pnpm db:stop
